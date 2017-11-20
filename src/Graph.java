@@ -64,7 +64,7 @@ public class Graph<T> {
      * @return the adjacency list of this graph
      */
     public Map<Vertex<T>, List<Edge<T>>> getAdjList() {
-        return adjList;
+         return adjList;
     }
 
 }

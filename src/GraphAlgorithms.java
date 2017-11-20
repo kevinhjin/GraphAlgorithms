@@ -1,5 +1,10 @@
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.PriorityQueue;
+import java.util.Queue;
 import java.util.Set;
 
 /**
@@ -40,9 +45,44 @@ public class GraphAlgorithms {
      */
     public static <T> List<Vertex<T>> breadthFirstSearch(Vertex<T> start,
                                             Graph<T> graph) {
-        return null;
+        ArrayList<Vertex<T>> returnList = new ArrayList<>();
+        System.out.println("arraylist created");
+        Queue<Vertex<T>> queue = new LinkedList<>();
+        System.out.println("queue created");
+        Map<Vertex<T>, List<Edge<T>>> adjList = graph.getAdjList();
+        System.out.println(adjList);
+        returnList.add(start);
+        queue.add(start);
+        while (!queue.isEmpty()) {
+            System.out.println("the queue is size " + queue.size());
+            Vertex<T> top = queue.poll();
+            List<Edge<T>> adj = adjList.get(top);
+            for (Edge<T> edge : adj) {
+                if (!returnList.contains(edge.getV())) {
+                    System.out.println("entered if statement");
+                    Vertex<T> insertV = edge.getV();
+                    returnList.add(insertV);
+                    queue.add(insertV);
+                    System.out.println("The queue is now size " + queue.size() );
+                }
+            }
+        }
+        return returnList;
     }
-
+    private static <T> List<Vertex<T>> dfsVisit(Vertex<T> start,
+                                                Graph<T> graph, ArrayList<Vertex<T>> visitList) {
+        List<Edge<T>> adjList = graph.getAdjList().get(start);
+        if (!visitList.contains(start)) {
+            visitList.add(start);
+        }
+        for (Edge<T> edge : adjList) {
+            if (!visitList.contains(edge.getV())) {
+                visitList.add(edge.getV());
+                dfsVisit(edge.getV(), graph, visitList);
+            }
+        }
+        return visitList;
+    }
 
     /**
      * Performs a depth first search (dfs) on the input graph, starting at
@@ -74,7 +114,8 @@ public class GraphAlgorithms {
      */
     public static <T> List<Vertex<T>> depthFirstSearch(Vertex<T> start,
                                             Graph<T> graph) {
-        return null;
+        ArrayList<Vertex<T>> returnList = new ArrayList<>();
+        return dfsVisit(start, graph, returnList);
     }
 
 
