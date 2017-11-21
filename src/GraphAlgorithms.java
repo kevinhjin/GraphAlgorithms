@@ -1,4 +1,8 @@
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -46,24 +50,24 @@ public class GraphAlgorithms {
     public static <T> List<Vertex<T>> breadthFirstSearch(Vertex<T> start,
                                             Graph<T> graph) {
         ArrayList<Vertex<T>> returnList = new ArrayList<>();
-        System.out.println("arraylist created");
+        System.out.println("arraylist created"); //REMOVE
         Queue<Vertex<T>> queue = new LinkedList<>();
-        System.out.println("queue created");
+        System.out.println("queue created"); //REMOVE
         Map<Vertex<T>, List<Edge<T>>> adjList = graph.getAdjList();
-        System.out.println(adjList);
+        System.out.println(adjList); //REMOVE
         returnList.add(start);
         queue.add(start);
         while (!queue.isEmpty()) {
-            System.out.println("the queue is size " + queue.size());
+            System.out.println("the queue is size " + queue.size()); // REMOVE
             Vertex<T> top = queue.poll();
             List<Edge<T>> adj = adjList.get(top);
             for (Edge<T> edge : adj) {
                 if (!returnList.contains(edge.getV())) {
-                    System.out.println("entered if statement");
+                    System.out.println("entered if statement"); //REMOVE
                     Vertex<T> insertV = edge.getV();
                     returnList.add(insertV);
                     queue.add(insertV);
-                    System.out.println("The queue is now size " + queue.size() );
+                    System.out.println("The queue is now size " + queue.size() ); //REMOVE
                 }
             }
         }
@@ -150,7 +154,44 @@ public class GraphAlgorithms {
      */
     public static <T> Map<Vertex<T>, Integer> dijkstras(Vertex<T> start,
                                                       Graph<T> graph) {
-        return null;
+        Map<Vertex<T>, Integer> distances = new HashMap<>();
+        Map<Vertex<T>, List<Edge<T>>> adjList = graph.getAdjList();
+        //Set<T> edges = (Set<T>) graph.getEdges();
+        PriorityQueue<Edge<T>> queue = new PriorityQueue<>();
+        Set<Vertex<T>> visited = new HashSet<>();
+        visited.add(start);
+        for (Vertex<T> vertex : adjList.keySet()) { //create the distance map
+            if (!distances.containsKey(vertex) && vertex.getData() == start.getData()) {
+                distances.put(vertex, 0);
+            } else {
+                distances.put(vertex, Integer.MAX_VALUE);
+            }
+        }
+        List<Edge<T>> startAdjEdges = graph.getAdjList().get(start);
+        queue.addAll(startAdjEdges);
+        System.out.println(distances); //remove
+        while (!queue.isEmpty()) {
+            Edge<T> minEdge = queue.poll();
+            Vertex<T> v1 = minEdge.getU();
+            Vertex<T> v2 = minEdge.getV();
+            visited.add(v1);
+            if (distances.get(v2) > distances.get(v1) + minEdge.getWeight()) {
+                distances.put(v2, distances.get(v1) + minEdge.getWeight());
+            }
+            List<Edge<T>> v2Adjedges = graph.getAdjList().get(v2);
+            for (Edge<T> edge : v2Adjedges) {
+                Vertex<T> x2 = edge.getV();
+                Vertex<T> x1 = edge.getU();
+                if (distances.get(x2) > distances.get(x1) + edge.getWeight()) {
+                    distances.put(x2, distances.get(x1) + edge.getWeight());
+                }
+                if (!visited.contains(edge.getV())) {
+                    queue.add(edge);
+                }
+            }
+        }
+        System.out.println(distances);// ensures that the distances are correct REMOVE
+        return distances;
     }
 
 
@@ -191,6 +232,35 @@ public class GraphAlgorithms {
      * @return the MST of the graph or null if there is no valid MST
      */
     public static <T> Set<Edge<T>> kruskals(Graph<T> graph) {
-        return null;
+        PriorityQueue<Edge<T>> priQueue = new PriorityQueue<>(graph.getEdges());
+        Set<Edge<T>> edges = graph.getEdges();
+        List<Vertex<T>> vertexList = new ArrayList<>();
+        Set<Edge<T>> mst = new HashSet<>();
+        for (Edge<T> edge : edges) { //places verteces into a list
+            Vertex<T> v1 = edge.getU();
+            if (!vertexList.contains(v1)) {
+                vertexList.add(v1);
+            }
+        }
+        DisjointSet<Vertex<T>> disjoint = new DisjointSet<>(vertexList); //creates a disjoint set based on the list created above
+        while (!priQueue.isEmpty()) {
+            Edge<T> edge = priQueue.poll();
+            Vertex<T> u = edge.getU();
+            Vertex<T> v = edge.getV();
+            Vertex<T> u1 = disjoint.find(u);
+            Vertex<T> v1 = disjoint.find(v);
+            if (!v1.getData().equals(u1.getData())) {
+                mst.add(edge);
+                Vertex<T> u2 = edge.getU();
+                Vertex<T> v2 = edge.getV();
+                Edge<T> reverse = new Edge<>(v2, u2, edge.getWeight());
+                mst.add(reverse);
+                disjoint.union(u1, v1);
+            }
+        }
+
+        return mst;
+
+
     }
 }
